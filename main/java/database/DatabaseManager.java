@@ -1,8 +1,6 @@
 package database;
 
 import gemstones.Gemstone;
-import gemstones.PreciousGemstone;
-import gemstones.SemiPreciousGemstone;
 import necklace.Necklace;
 import utils.LoggerUtil;
 
@@ -84,7 +82,7 @@ public class DatabaseManager {
                     ps.setDouble(3, gem.getWeight());
                     ps.setDouble(4, gem.getPrice());
                     ps.setDouble(5, gem.getTransparency());
-                    ps.setString(6, gem instanceof PreciousGemstone ? "PRECIOUS" : "SEMI_PRECIOUS");
+                    ps.setString(6, gem.getType());
                     ps.addBatch();
                 }
                 ps.executeBatch();
@@ -116,18 +114,13 @@ public class DatabaseManager {
                         ResultSet gemRs = ps.executeQuery();
 
                         while (gemRs.next()) {
-                            Gemstone gem;
-                            if ("PRECIOUS".equals(gemRs.getString("type"))) {
-                                gem = new PreciousGemstone();
-                            } else {
-                                gem = new SemiPreciousGemstone();
-                            }
-
+                            Gemstone gem = new Gemstone();
                             gem.setId(gemRs.getInt("id"));
                             gem.setName(gemRs.getString("name"));
                             gem.setWeight(gemRs.getDouble("weight"));
                             gem.setPrice(gemRs.getDouble("price"));
                             gem.setTransparency(gemRs.getDouble("transparency"));
+                            gem.setType(gemRs.getString("type"));
 
                             necklace.addGemstone(gem);
                         }
