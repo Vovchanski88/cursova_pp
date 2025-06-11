@@ -1,6 +1,6 @@
 package commands;
 
-import gemstones.*;
+import gemstones.Gemstone;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ChoiceDialog;
@@ -24,54 +24,51 @@ public class CreateNecklaceAndAddGemstoneCommand implements Command {
         outputArea.appendText("Намисто створено!\n");
 
         while (true) {
-            Optional<String> result = showTextInputDialog("1",
+            Optional<String> typeResult = showChoiceDialog(
                 "Додавання каменя",
-                "Виберіть тип каменя",
-                "Тип каменя (1 - Дорогоцінний, 2 - Напівкоштовний або -1 для виходу):");
+                "Виберіть тип каменя або 'Вихід' для завершення",
+                new String[]{"Дорогоцінний", "Напівкоштовний", "Вихід"}
+            );
 
-            if (result.isEmpty() || result.get().equals("-1")) {
+            if (typeResult.isEmpty() || typeResult.get().equals("Вихід")) {
                 break;
             }
 
-            try {
-                int gemType = Integer.parseInt(result.get());
-                Gemstone gemstone = createGemstone(gemType);
-                if (gemstone != null) {
-                    necklace.addGemstone(gemstone);
-                    outputArea.appendText("Камінь додано до намиста.\n");
-                } else {
-                    outputArea.appendText("Невірний тип каменя.\n");
-                }
-            } catch (NumberFormatException e) {
-                outputArea.appendText("Будь ласка, введіть число.\n");
+            String gemType = typeResult.get();
+            Gemstone gemstone = createGemstone(gemType);
+            if (gemstone != null) {
+                necklace.addGemstone(gemstone);
+                outputArea.appendText("Камінь додано до намиста.\n");
+            } else {
+                outputArea.appendText("Невірний вибір.\n");
             }
         }
     }
 
-    public Gemstone createGemstone(int type) {
+    public Gemstone createGemstone(String type) {
+        String[] gemOptions;
+        if (type.equals("Дорогоцінний")) {
+            gemOptions = new String[]{"Алмаз", "Рубін", "Сапфір"};
+        } else if (type.equals("Напівкоштовний")) {
+            gemOptions = new String[]{"Бірюза", "Опал", "Аметист"};
+        } else {
+            return null;
+        }
+
         Optional<String> gemResult = showChoiceDialog(
-            "Вибір каменя", "Виберіть камінь:",
-            type == 1
-                ? new String[]{"1. Алмаз", "2. Рубін", "3. Сапфір"}
-                : new String[]{"1. Бірюза", "2. Опал", "3. Аметист"}
+            "Вибір каменя",
+            "Виберіть конкретний камінь:",
+            gemOptions
         );
 
         if (gemResult.isEmpty()) return null;
 
-        int gemChoice = Integer.parseInt(gemResult.get().substring(0, 1));
-        String name = getGemstoneName(type, gemChoice);
-        if (name == null) {
-            outputArea.appendText("Невірний вибір.\n");
-            return null;
-        }
-
+        String name = gemResult.get();
         double weight = promptDouble("Вага (карати):", "Введіть вагу каменя");
         double price = promptDouble("Ціна:", "Введіть ціну каменя");
         double transparency = promptDouble("Прозорість (%):", "Введіть прозорість каменя");
 
-        return type == 1
-            ? new PreciousGemstone(name, weight, price, transparency)
-            : new SemiPreciousGemstone(name, weight, price, transparency);
+        return new Gemstone(type, name, weight, price, transparency);
     }
 
     public Optional<String> showTextInputDialog(String title, String header, String content, String defaultValue) {
