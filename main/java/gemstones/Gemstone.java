@@ -8,10 +8,12 @@ public class Gemstone implements Serializable {
     private double weight;
     private double price;
     private double transparency;
+    private String type;
 
     public Gemstone() {}
 
-    public Gemstone(String name, double weight, double price, double transparency) {
+    public Gemstone(String type, String name, double weight, double price, double transparency) {
+        this.type = type;
         this.name = name;
         this.weight = weight;
         this.price = price;
@@ -29,6 +31,8 @@ public class Gemstone implements Serializable {
     public void setPrice(double price) { this.price = price; }
     public double getTransparency() { return transparency; }
     public void setTransparency(double transparency) { this.transparency = transparency; }
+    public String getType() { return type; }
+    public void setType(String type) { this.type = type; }
 
     @Override
     public String toString() {
